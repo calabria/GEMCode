@@ -12,14 +12,13 @@ process = cms.Process('GEMCSCTRGANA')
 cmssw = os.getenv( "CMSSW_VERSION" )
 
 ## steering
-events = 50000
+events = 20000
 defaultEmu = False
-ganged = True
-ganged = False
 pileup='000'
 sample='dimu'
 globalTag = 'upgrade2019'
 #sample='minbias'
+
 
 ## input
 from GEMCode.SimMuL1.GEMCSCTriggerSamplesLib import files
@@ -40,8 +39,6 @@ for d in range(len(inputDir)):
   ## this works only if you pass the location on pnfs - FIXME for files staring with store/user/... 
   theInputFiles.extend([my_dir[16:] + x for x in ls if x.endswith('root')])
     
-theInputFiles = theInputFiles[:60]
-##inputFiles = ['file:out_SingleMuPt10Fwd_GEM2019_8PartIncRad_DIGI_L1.root']
 print "InputFiles: ", theInputFiles
 
 ## readout windows
@@ -56,8 +53,7 @@ if w==61:
     readout_windows = [ [5,10],[1,11],[1,11],[1,11] ]
  
 ## output
-outputFileName = 'hp_' + sample + "_" + cmssw + "_" + globalTag + "_pu%s"%(pileup) + '_w%d'%(w) + suffix + '_eff.test.root'
-#outputFileName = 'gem_trigger_eff_ana.root'
+outputFileName = 'hp_' + sample + "_" + cmssw + "_" + globalTag + "_pu%s"%(pileup) + '_w%d'%(w) + suffix + '_eff.root'
 print "outputFile:", outputFileName
 
 # import of standard configurations
@@ -122,6 +118,9 @@ process.GEMCSCTriggerEfficiency.minBxLCT = readout_windows[2][0]
 process.GEMCSCTriggerEfficiency.maxBxLCT = readout_windows[2][1]
 process.GEMCSCTriggerEfficiency.minBxMPLCT = readout_windows[3][0]
 process.GEMCSCTriggerEfficiency.maxBxMPLCT = readout_windows[3][1]
+process.GEMCSCTriggerEfficiency.minNHitsChamber = cms.untracked.int32(4)
+process.GEMCSCTriggerEfficiency.requireME1WithMinNHitsChambers = cms.untracked.bool(True)
+process.GEMCSCTriggerEfficiency.minSimTrPt = cms.untracked.double(2)
 process.GEMCSCTriggerEfficiency.simTrackMatching.gemRecHitInput = ""
 #SimTrackMatching.verboseSimHit = 1
 #SimTrackMatching.verboseGEMDigi = 1
