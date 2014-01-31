@@ -13,21 +13,37 @@ CSCStubMatcher::CSCStubMatcher(SimHitMatcher& sh, CSCDigiMatcher& dg)
 : DigiMatcher(sh)
 , digi_matcher_(&dg)
 {
-  clctInput_ = conf().getUntrackedParameter<edm::InputTag>("cscCLCTInput", edm::InputTag("simCscTriggerPrimitiveDigis"));
-  alctInput_ = conf().getUntrackedParameter<edm::InputTag>("cscALCTInput", edm::InputTag("simCscTriggerPrimitiveDigis"));
-  lctInput_ = conf().getUntrackedParameter<edm::InputTag>("cscLCTInput", edm::InputTag("simCscTriggerPrimitiveDigis"));
-  mplctInput_ = conf().getUntrackedParameter<edm::InputTag>("cscMPLCTInput", edm::InputTag("simCscTriggerPrimitiveDigis","MPCSORTED"));
+  auto cscCLCT_ = conf().getParameter<edm::ParameterSet>("cscCLCT");
+  clctInput_ = cscCLCT_.getParameter<edm::InputTag>("input");
+  minBXCLCT_ = cscCLCT_.getParameter<int>("minBX");
+  maxBXCLCT_ = cscCLCT_.getParameter<int>("maxBX");
+  verboseCLCT_ = cscCLCT_.getParameter<int>("verbose");
+  minNHitsChamberCLCT_ = cscCLCT_.getParameter<int>("minNHitsChamber");
 
-  minBXCLCT_ = conf().getUntrackedParameter<int>("minBXCLCT", 3);
-  maxBXCLCT_ = conf().getUntrackedParameter<int>("maxBXCLCT", 9);
-  minBXALCT_ = conf().getUntrackedParameter<int>("minBXALCT", 3);
-  maxBXALCT_ = conf().getUntrackedParameter<int>("maxBXALCT", 8);
-  minBXLCT_ = conf().getUntrackedParameter<int>("minBXLCT", 3);
-  maxBXLCT_ = conf().getUntrackedParameter<int>("maxBXLCT", 8);
-  minBXMPLCT_ = conf().getUntrackedParameter<int>("minBXLCT", 3);
-  maxBXMPLCT_ = conf().getUntrackedParameter<int>("maxBXLCT", 8);
-  addGhostLCTs_ = conf().getUntrackedParameter<bool>("addGhostLCTs", true);
-  addGhostMPLCTs_ = conf().getUntrackedParameter<bool>("addGhostMPLCTs", true);
+  auto cscALCT_ = conf().getParameter<edm::ParameterSet>("cscALCT");
+  alctInput_ = cscALCT_.getParameter<edm::InputTag>("input");
+  minBXALCT_ = cscALCT_.getParameter<int>("minBX");
+  maxBXALCT_ = cscALCT_.getParameter<int>("maxBX");
+  verboseALCT_ = cscALCT_.getParameter<int>("verbose");
+  minNHitsChamberALCT_ = cscALCT_.getParameter<int>("minNHitsChamber");
+
+  auto cscLCT_ = conf().getParameter<edm::ParameterSet>("cscLCT");
+  lctInput_ = cscLCT_.getParameter<edm::InputTag>("input");
+  minBXLCT_ = cscLCT_.getParameter<int>("minBX");
+  maxBXLCT_ = cscLCT_.getParameter<int>("maxBX");
+  verboseLCT_ = cscLCT_.getParameter<int>("verbose");
+  minNHitsChamberLCT_ = cscLCT_.getParameter<int>("minNHitsChamber");
+  addGhostLCTs_ = cscLCT_.getParameter<bool>("addGhosts");
+
+  auto cscMPLCT_ = conf().getParameter<edm::ParameterSet>("cscMPLCT");
+  mplctInput_ = cscMPLCT_.getParameter<edm::InputTag>("input");
+  minBXMPLCT_ = cscMPLCT_.getParameter<int>("minBX");
+  maxBXMPLCT_ = cscMPLCT_.getParameter<int>("maxBX");
+  verboseMPLCT_ = cscMPLCT_.getParameter<int>("verbose");
+  minNHitsChamberMPLCT_ = cscMPLCT_.getParameter<int>("minNHitsChamber");
+  addGhostMPLCTs_ = cscMPLCT_.getParameter<bool>("addGhosts");
+
+  minNHitsChamber_ = conf().getUntrackedParameter<int>("minNHitsChamber", 4);
 
   setVerbose(conf().getUntrackedParameter<int>("verboseCSCStub", 0));
 
@@ -70,11 +86,11 @@ CSCStubMatcher::matchCLCTsToSimTrack(const CSCCLCTDigiCollection& clcts)
   // only look for stub in chambers that have digis matching to this track
 
   auto cathode_ids = digi_matcher_->chamberIdsStrip(0);
-  int n_4layers = 0;
+  int n_minLayers = 0;
   for (auto id: cathode_ids)
   {
     CSCDetId ch_id(id);
-    if (digi_matcher_->nLayersWithStripInChamber(id) >= 4) ++n_4layers;
+    if (digi_matcher_->nLayersWithStripInChamber(id) >= minNHitsChamber_) ++n_minLayers;
 
     // fill 1 half-strip wide gaps
     auto digi_strips = digi_matcher_->stripsInChamber(id, 1);
@@ -135,7 +151,7 @@ CSCStubMatcher::matchCLCTsToSimTrack(const CSCCLCTDigiCollection& clcts)
     }
   }
 
-  if (verbose() && n_4layers > 0)
+  if (verbose() && n_minLayers > 0)
   {
     if (chamber_to_clct_.size() == 0)
     {
@@ -163,10 +179,10 @@ CSCStubMatcher::matchALCTsToSimTrack(const CSCALCTDigiCollection& alcts)
   // only look for stub in chambers that have digis matching to this track
 
   auto anode_ids = digi_matcher_->chamberIdsWire(0);
-  int n_4layers = 0;
+  int n_minLayers = 0;
   for (auto id: anode_ids)
   {
-    if (digi_matcher_->nLayersWithWireInChamber(id) >= 4) ++n_4layers;
+    if (digi_matcher_->nLayersWithWireInChamber(id) >= minNHitsChamber_) ++n_minLayers;
     CSCDetId ch_id(id);
 
     // fill 1 WG wide gaps
@@ -222,7 +238,7 @@ CSCStubMatcher::matchALCTsToSimTrack(const CSCALCTDigiCollection& alcts)
     }
   }
 
-  if (verbose() && n_4layers > 0)
+  if (verbose() && n_minLayers > 0)
   {
     if (chamber_to_alct_.size() == 0)
     {
@@ -258,10 +274,10 @@ CSCStubMatcher::matchLCTsToSimTrack(const CSCCorrelatedLCTDigiCollection& lcts)
       std::inserter(cathode_and_anode_ids, cathode_and_anode_ids.end())
   );
 
-  int n_4layers = 0;
+  int n_minLayers = 0;
   for (auto id: cathode_and_anode_ids)
   {
-    if (digi_matcher_->nLayersWithStripInChamber(id) >= 4 && digi_matcher_->nLayersWithWireInChamber(id) >= 4) ++n_4layers;
+    if (digi_matcher_->nLayersWithStripInChamber(id) >= minNHitsChamber_ && digi_matcher_->nLayersWithWireInChamber(id) >= minNHitsChamber_) ++n_minLayers;
     CSCDetId ch_id(id);
 
     auto lcts_in_det = lcts.get(ch_id);
@@ -358,7 +374,7 @@ CSCStubMatcher::matchLCTsToSimTrack(const CSCCorrelatedLCTDigiCollection& lcts)
     }
   }
 
-  if (verbose() && n_4layers > 0)
+  if (verbose() && n_minLayers > 0)
   {
     if (chamber_to_lct_.size() == 0)
     {
@@ -395,10 +411,10 @@ CSCStubMatcher::matchMPLCTsToSimTrack(const CSCCorrelatedLCTDigiCollection& mplc
       std::inserter(cathode_and_anode_ids, cathode_and_anode_ids.end())
   );
 
-  int n_4layers = 0;
+  int n_minLayers = 0;
   for (auto id: cathode_and_anode_ids)
   {
-    if (digi_matcher_->nLayersWithStripInChamber(id) >= 4 && digi_matcher_->nLayersWithWireInChamber(id) >= 4) ++n_4layers;
+    if (digi_matcher_->nLayersWithStripInChamber(id) >= minNHitsChamber_ && digi_matcher_->nLayersWithWireInChamber(id) >= minNHitsChamber_) ++n_minLayers;
     CSCDetId ch_id(id);
 
     auto mplcts_in_det = mplcts.get(ch_id);
@@ -495,7 +511,7 @@ CSCStubMatcher::matchMPLCTsToSimTrack(const CSCCorrelatedLCTDigiCollection& mplc
     }
   }
 
-  if (verbose() && n_4layers > 0)
+  if (verbose() && n_minLayers > 0)
   {
     if (chamber_to_lct_.size() == 0)
     {

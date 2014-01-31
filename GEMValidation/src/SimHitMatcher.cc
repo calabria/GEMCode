@@ -37,10 +37,18 @@ SimHitMatcher::SimHitMatcher(const SimTrack& t, const SimVertex& v,
       const edm::ParameterSet& ps, const edm::Event& ev, const edm::EventSetup& es)
 : BaseMatcher(t, v, ps, ev, es)
 {
-  simMuOnlyCSC_ = conf().getUntrackedParameter<bool>("simMuOnlyCSC", true);
-  simMuOnlyGEM_ = conf().getUntrackedParameter<bool>("simMuOnlyGEM", true);
-  discardEleHitsCSC_ = conf().getUntrackedParameter<bool>("discardEleHitsCSC", true);
-  discardEleHitsGEM_ = conf().getUntrackedParameter<bool>("discardEleHitsGEM", true);
+  auto gemSimHit_ = conf().getParameter<edm::ParameterSet>("gemSimHit");
+  verboseGEM_ = gemSimHit_.getParameter<int>("verbose");
+  gemSimHitInput_ = gemSimHit_.getParameter<edm::InputTag>("input");
+  simMuOnlyGEM_ = gemSimHit_.getParameter<bool>("simMuOnly");
+  discardEleHitsGEM_ = gemSimHit_.getParameter<bool>("discardEleHits");
+
+  auto cscSimHit_= conf().getParameter<edm::ParameterSet>("cscSimHit");
+  verboseCSC_ = cscSimHit_.getParameter<int>("verbose");
+  cscSimHitInput_ = cscSimHit_.getParameter<edm::InputTag>("input");
+  simMuOnlyCSC_ = cscSimHit_.getParameter<bool>("simMuOnly");
+  discardEleHitsCSC_ = cscSimHit_.getParameter<bool>("discardEleHits");
+
   simInputLabel_ = conf().getUntrackedParameter<std::string>("simInputLabel", "g4SimHits");
 
   setVerbose(conf().getUntrackedParameter<int>("verboseSimHit", 0));
