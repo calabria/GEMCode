@@ -2,7 +2,7 @@
 import os
 import FWCore.ParameterSet.Config as cms
 
-process = cms.Process("MUTRG")
+process = cms.Process("TAO")
 
 ## Standard sequence
 process.load('Configuration.StandardSequences.Services_cff')
@@ -76,9 +76,9 @@ process = customize_digi_addGEM_muon_only(process) # only muon+GEM digi
 ## GEM geometry customization
 use6part = True
 if use6part:
-    mynum = process.XMLIdealGeometryESSource.geomXMLFiles.index('Geometry/MuonCommonData/data/v4/gemf.xml')
-    process.XMLIdealGeometryESSource.geomXMLFiles.remove('Geometry/MuonCommonData/data/v4/gemf.xml')
-    process.XMLIdealGeometryESSource.geomXMLFiles.insert(mynum,'Geometry/MuonCommonData/data/v2/gemf.xml')
+     mynum = process.XMLIdealGeometryESSource.geomXMLFiles.index('Geometry/MuonCommonData/data/v5/gem11.xml')
+     process.XMLIdealGeometryESSource.geomXMLFiles.remove('Geometry/MuonCommonData/data/v5/gem11.xml')
+     process.XMLIdealGeometryESSource.geomXMLFiles.insert(mynum,'Geometry/MuonCommonData/data/v2/gem11.xml')
 
 ## upgrade CSC geometry customizations
 from SLHCUpgradeSimulations.Configuration.muonCustoms import unganged_me1a_geometry, digitizer_timing_pre3_median
@@ -94,12 +94,14 @@ process.simCscTriggerPrimitiveDigis.CSCWireDigiProducer = cms.InputTag('simMuonC
 ## GEM-CSC bending angle library
 process.simCscTriggerPrimitiveDigis.gemPadProducer =  cms.untracked.InputTag("simMuonGEMCSCPadDigis","")
 process.simCscTriggerPrimitiveDigis.clctSLHC.clctPidThreshPretrig = 2
+process.simCscTriggerPrimitiveDigis.clctParam07.clctPidThreshPretrig = 2
 process.simCscTriggerPrimitiveDigis.clctSLHC.clctNplanesHitPretrig = 3
 process.simCscTriggerPrimitiveDigis.clctSLHC.clctNplanesHitPattern = 3
-#process.simCscTriggerPrimitiveDigis.clctParam07.clctPidThreshPretrig = 2
 tmb = process.simCscTriggerPrimitiveDigis.tmbSLHC
 tmb.gemMatchDeltaEta = cms.untracked.double(0.08)
 tmb.gemMatchDeltaBX = cms.untracked.int32(1)
+tmb.printAvailablePads = cms.untracked.bool(False)
+tmb.dropLowQualityCLCTsNoGEMs = cms.untracked.bool(True)
 
 dphi_lct_pad98 = {
     'pt05' : { 'odd' :   0.0220351 , 'even' :  0.00930056 },
@@ -153,18 +155,17 @@ if pu is not 0:
 process.source = cms.Source("PoolSource",
   duplicateCheckMode = cms.untracked.string('noDuplicateCheck'),
   inputCommands = cms.untracked.vstring('keep  *_*_*_*'),
-  fileNames = cms.untracked.vstring('file:out_digi.root')
+  fileNames = cms.untracked.vstring('file:out_sim.root')
 )
 
-import os
+## use files given a list of input directories
 from GEMCode.SimMuL1.GEMCSCTriggerSamplesLib import files
+import os
 useInputDir = True
 if useInputDir:
-    ## input
-    suffix = '_gem98_pt2-50_PU0_pt0_new'
+    suffix = '_pt2-50'
     inputDir = files[suffix]
     theInputFiles = []
-    import os
     for d in range(len(inputDir)):
         my_dir = inputDir[d]
         if not os.path.isdir(my_dir):

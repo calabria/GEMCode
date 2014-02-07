@@ -20,6 +20,11 @@
 #include "MagneticField/Engine/interface/MagneticField.h"
 #include "TrackingTools/GeomPropagators/interface/Propagator.h"
 
+#include "Geometry/GEMGeometry/interface/GEMGeometry.h"
+#include "Geometry/GEMGeometry/interface/ME0Geometry.h"
+#include "Geometry/RPCGeometry/interface/RPCGeometry.h"
+#include "Geometry/CSCGeometry/interface/CSCGeometry.h"
+
 //static const float AVERAGE_GEM_Z(587.5); // [cm]
 static const float AVERAGE_GEM_Z(568.6); // [cm]
 
@@ -29,8 +34,14 @@ public:
   
   /// CSC chamber types, according to CSCDetId::iChamberType()
   enum CSCType {CSC_ALL = 0, CSC_ME1a, CSC_ME1b, CSC_ME12, CSC_ME13,
-      CSC_ME21, CSC_ME22, CSC_ME31, CSC_ME32, CSC_ME41, CSC_ME42};
+		CSC_ME21, CSC_ME22, CSC_ME31, CSC_ME32, CSC_ME41, CSC_ME42};
 
+  /// GEM chamber types
+  enum GEMType {GEM_ALL = 0, GEM_ME11, GEM_ME21};
+
+  /// RPC endcap chamber types
+  enum RPCType {RPC_ALL = 0, RPC_ME12, RPC_ME13, RPC_ME22, RPC_ME23, 
+		RPC_ME31, RPC_ME32, RPC_ME33, RPC_ME41, RPC_ME42, RPC_ME43};
 
   BaseMatcher(const SimTrack& t, const SimVertex& v,
       const edm::ParameterSet& ps, const edm::Event& ev, const edm::EventSetup& es);
@@ -40,7 +51,6 @@ public:
   // non-copyable
   BaseMatcher(const BaseMatcher&) = delete;
   BaseMatcher& operator=(const BaseMatcher&) = delete;
-
 
   const SimTrack& trk() const {return trk_;}
   const SimVertex& vtx() const {return vtx_;}
@@ -65,7 +75,30 @@ public:
   /// propagate the track to average GEM z-position                                                                            
   GlobalPoint propagatedPositionGEM() const;
 
-private:
+  /// geometry
+  void setGEMGeometry(const GEMGeometry *geom) {gemGeometry_ = geom;}
+  void setRPCGeometry(const RPCGeometry *geom) {rpcGeometry_ = geom;}
+  void setME0Geometry(const ME0Geometry *geom) {me0Geometry_ = geom;}
+  void setCSCGeometry(const CSCGeometry *geom) {cscGeometry_ = geom;}
+
+  const GEMGeometry* getGEMGeometry() const {return gemGeometry_;}
+  const RPCGeometry* getRPCGeometry() const {return rpcGeometry_;}
+  const ME0Geometry* getME0Geometry() const {return me0Geometry_;}
+  const CSCGeometry* getCSCGeometry() const {return cscGeometry_;}
+
+ protected:
+  
+  const CSCGeometry* cscGeometry_;
+  const RPCGeometry* rpcGeometry_;
+  const GEMGeometry* gemGeometry_;
+  const ME0Geometry* me0Geometry_;
+
+  bool hasGEMGeometry_;
+  bool hasRPCGeometry_;
+  bool hasME0Geometry_;
+  bool hasCSCGeometry_;
+  
+ private:
 
   const SimTrack& trk_;
   const SimVertex& vtx_;
