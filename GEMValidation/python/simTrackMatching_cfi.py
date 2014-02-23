@@ -7,6 +7,7 @@ SimTrackMatching = cms.PSet(
     ntupleTrackEff = cms.bool(True),
     overrideminNHitsChamber = cms.bool(False),
     minNHitsChamber = cms.untracked.int32(4),
+    verbose = cms.bool(False),
     ## per collection params
     simTrack = cms.PSet(
         verbose = cms.int32(0),
@@ -62,6 +63,13 @@ SimTrackMatching = cms.PSet(
         input = cms.InputTag('g4SimHits','MuonRPCHits'),
         simMuOnly = cms.bool(True),
         discardEleHits = cms.bool(True),
+    ),
+    rpcStripDigi = cms.PSet(
+        verbose = cms.int32(0),
+        input = cms.InputTag("simMuonRPCDigis"),
+        minBX = cms.int32(-1),
+        maxBX = cms.int32(1),
+        matchDeltaStrip = cms.int32(1),
     ),
     cscSimHit = cms.PSet(
         verbose = cms.int32(0),

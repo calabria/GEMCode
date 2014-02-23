@@ -226,7 +226,7 @@ MuonDigiAnalyzer::MuonDigiAnalyzer(const edm::ParameterSet& ps)
 , hasME0Geometry_(true)
 , hasCSCGeometry_(true)
 {
-  auto cfg_ = ps.getParameter<edm::ParameterSet>("simTrackMatching");
+  cfg_ = ps.getParameter<edm::ParameterSet>("simTrackMatching");
   auto simTrack = cfg_.getParameter<edm::ParameterSet>("simTrack");
   simTrackInput_ = simTrack.getParameter<edm::InputTag>("input");
   simTrackMinPt_ = simTrack.getParameter<double>("minPt");
@@ -235,10 +235,10 @@ MuonDigiAnalyzer::MuonDigiAnalyzer(const edm::ParameterSet& ps)
   simTrackMaxEta_ = simTrack.getParameter<double>("maxEta");
   simTrackOnlyMuon_ = simTrack.getParameter<bool>("onlyMuon");
 
-  auto gemDigi = cfg_.getParameter<edm::ParameterSet>("gemDigi");
+  auto gemDigi = cfg_.getParameter<edm::ParameterSet>("gemStripDigi");
   gemDigiInput_ = gemDigi.getParameter<edm::InputTag>("input");
   
-  auto rpcDigi = cfg_.getParameter<edm::ParameterSet>("rpcDigi");
+  auto rpcDigi = cfg_.getParameter<edm::ParameterSet>("rpcStripDigi");
   rpcDigiInput_ = rpcDigi.getParameter<edm::InputTag>("input");
 
   auto gemPadDigi= cfg_.getParameter<edm::ParameterSet>("gemPadDigi");
@@ -891,10 +891,10 @@ void MuonDigiAnalyzer::fillDescriptions(edm::ConfigurationDescriptions& descript
 void MuonDigiAnalyzer::buildLUT()
 {
   std::vector<int> pos_ids;
-  pos_ids.push_back(GEMDetId(1,1,1,1,36,1).rawId());
+  pos_ids.push_back(GEMDetId(1,1,1,1,36,2).rawId());
 
   std::vector<int> neg_ids;
-  neg_ids.push_back(GEMDetId(-1,1,1,1,36,1).rawId());
+  neg_ids.push_back(GEMDetId(-1,1,1,1,36,2).rawId());
 
   // VK: I would really suggest getting phis from GEMGeometry
   
@@ -902,8 +902,8 @@ void MuonDigiAnalyzer::buildLUT()
   phis.push_back(0.);
   for(int i=1; i<37; ++i)
   {
-    pos_ids.push_back(GEMDetId(1,1,1,1,i,1).rawId());
-    neg_ids.push_back(GEMDetId(-1,1,1,1,i,1).rawId());
+    pos_ids.push_back(GEMDetId(1,1,1,1,i,2).rawId());
+    neg_ids.push_back(GEMDetId(-1,1,1,1,i,2).rawId());
     phis.push_back(i*10.);
   }
   positiveLUT_ = std::make_pair(phis,pos_ids);
