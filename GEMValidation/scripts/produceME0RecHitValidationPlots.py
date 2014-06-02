@@ -14,7 +14,7 @@ ROOT.gROOT.SetBatch(1)
 
 if __name__ == "__main__":  
 
-  inputFile = '/afs/cern.ch/work/c/calabria/private/ME0Marcello2/CMSSW_6_2_0_SLHC7/src/GEMCode/GEMValidation/test/gem_localrec_ana.root'
+  inputFile = '/afs/cern.ch/work/c/calabria/private/ME0Latest/CMSSW_6_2_0_SLHC13/src/GEMCode/GEMValidation/test/gem_localrec_ana.root'
   #outputFile = '/afs/cern.ch/work/c/calabria/private/ME0Marcello2/CMSSW_6_2_0_SLHC7/src/GEMCode/GEMValidation/test/gem_localrec_ana_tmp.root'
   targetDir = './'
   

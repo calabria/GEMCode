@@ -762,6 +762,63 @@ void MuonDigiAnalyzer::analyzeME0PreReco(const edm::Event& iEvent)
     trackIds.push_back(t.trackId());
   }
 
+    for(ME0DigiPreRecoCollection::DigiRangeIterator cItr = me0_digis->begin(); cItr != me0_digis->end(); ++cItr)
+    {
+	ME0DetId id = (*cItr).first; 
+        std::cout<<"chitestramurt"<<std::endl;
+
+	const GeomDet* gdet = me0_geo_->idToDet(id);
+	const BoundPlane & surface = gdet->surface();
+
+	me0_digi_.detId = id();
+	me0_digi_.region = (Short_t) id.region();
+	me0_digi_.ring = 0;
+	me0_digi_.station = 0;
+	me0_digi_.layer = (Short_t) id.layer();
+	me0_digi_.chamber = (Short_t) id.chamber();
+	me0_digi_.roll = (Short_t) id.roll();
+
+	ME0DigiPreRecoCollection::const_iterator digiItr; 
+	//loop over digis of given roll
+	for (digiItr = (*cItr ).second.first; digiItr != (*cItr ).second.second; ++digiItr)
+	{
+
+        std::cout<<"chitestramurt2"<<std::endl;
+		me0_digi_.strip = 0;
+		me0_digi_.bx = 0;
+
+		me0_digi_.x = (Float_t) digiItr->x();
+		me0_digi_.y = (Float_t) digiItr->y();
+
+		LocalPoint lp(digiItr->x(), digiItr->y(), 0);
+
+		GlobalPoint gp = surface.toGlobal(lp);
+		me0_digi_.g_r = (Float_t) gp.perp();
+		me0_digi_.g_eta = (Float_t) gp.eta();
+		me0_digi_.g_phi = (Float_t) gp.phi();
+		me0_digi_.g_x = (Float_t) gp.x();
+		me0_digi_.g_y = (Float_t) gp.y();
+		me0_digi_.g_z = (Float_t) gp.z();
+
+      		me0_digi_.x_sim = me0_sh.x;
+      		me0_digi_.y_sim = me0_sh.y;
+      		me0_digi_.g_eta_sim = me0_sh.globalEta;
+      		me0_digi_.g_phi_sim = me0_sh.globalPhi;
+      		me0_digi_.g_x_sim = me0_sh.globalX;
+      		me0_digi_.g_y_sim = me0_sh.globalY;
+      		me0_digi_.g_z_sim = me0_sh.globalZ;
+
+		// fill TTree
+		//if(me0_digi_.bx != 0) continue;
+
+
+	      		me0_tree_->Fill();
+
+	      	
+	}
+
+    }
+
   for (edm::PSimHitContainer::const_iterator itHit = ME0Hits->begin(); itHit != ME0Hits->end(); ++itHit)
   {
     if(abs(itHit->particleType()) != 13) continue;

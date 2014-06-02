@@ -26,21 +26,20 @@ if __name__ == "__main__":
   gStyle.SetStatStyle(0);
 
   plotter = SimHitPlotter()
-  simTrackProperties(plotter)
-  gemSimTrackToSimHitMatchingLX(plotter) 
-  gemSimTrackToSimHitMatchingLY(plotter) 
-  gemSimTrackToSimHitMatchingEta(plotter) 
-  gemSimTrackToSimHitMatchingPhi(plotter)
-  me0SimTrackToSimHitMatchingLX(plotter) 
-  me0SimTrackToSimHitMatchingLY(plotter) 
-  me0SimTrackToSimHitMatchingEta(plotter) 
-  me0SimTrackToSimHitMatchingPhi(plotter)
+  #simTrackProperties(plotter)
+  #gemSimTrackToSimHitMatchingLX(plotter) 
+  #gemSimTrackToSimHitMatchingLY(plotter) 
+  #gemSimTrackToSimHitMatchingEta(plotter) 
+  #gemSimTrackToSimHitMatchingPhi(plotter)
+  me0SimHitOccupancyXY(plotter)
+  me0SimHitOccupancyRZ(plotter)
+  me0SimHitTOF(plotter)
   
   for i in range(len(plotter.sel)):
 
-    gemSimHitOccupancyXY(plotter,i)
-    gemSimHitOccupancyRZ(plotter,i)
-    gemSimHitTOF(plotter,i)
+    #gemSimHitOccupancyXY(plotter,i)
+    #gemSimHitOccupancyRZ(plotter,i)
+    #gemSimHitTOF(plotter,i)
     #   gemSimhitMomentum(plotter,i) 
     #   GEMSimValidation.SimhitMomentum(plotter,i)
 
@@ -58,4 +57,4 @@ if __name__ == "__main__":
     me0SimHitTOF(plotter,i)
     """
     
-  gemChamberNumbering(plotter)
+  #gemChamberNumbering(plotter)
